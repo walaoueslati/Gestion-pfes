@@ -3,6 +3,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Login from './components/Login';
 
+import Actualite from './components/Actualite';
+
+import Affectation from './components/Affectation';
+
 import DisponibiliteProf from './components/DisponibiliteProf';
 
 function App() {
@@ -12,6 +16,8 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route path="login" element={<Login />} />
           <Route path="DisponibiliteProf" element={<DisponibiliteProf />} />
+          <Route path="Actualite" element={<Actualite />} />
+          <Route path="Affectation" element={<Affectation />} />
         </Route>
       </Routes>
     </BrowserRouter>
