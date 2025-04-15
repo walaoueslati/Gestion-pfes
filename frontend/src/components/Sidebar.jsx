@@ -109,6 +109,10 @@ function Sidebar(){
     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8h2a2 2 0 012 2v7a2 2 0 01-2 2h-2"></path><path d="M7 8H5a2 2 0 00-2 2v7a2 2 0 002 2h2m10-11V6a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 0v8"></path></svg>
     <span>Envoyer vos avis</span>
 </a>
+<a href="./DisponibiliteProf" class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8h2a2 2 0 012 2v7a2 2 0 01-2 2h-2"></path><path d="M7 8H5a2 2 0 00-2 2v7a2 2 0 002 2h2m10-11V6a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 0v8"></path></svg>
+    <span>Disponibilite prof</span>
+</a>
 
 <a href="#" class="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-gray-100">
     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12H3m12 0l-4-4m4 4l-4 4m13-4a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
