@@ -5,8 +5,6 @@ import Sidebar from './Sidebar';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  
   return (
     <div>
       <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
