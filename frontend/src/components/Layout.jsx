@@ -14,6 +14,7 @@ const Layout = () => {
           <div className="min-h-screen bg-gray-100">
             <Sidebar />
           </div>
+          
         )}
         <div className={`p-4 ${sidebarOpen ? 'w-3/4' : 'w-full'}`}>
           <Outlet />
