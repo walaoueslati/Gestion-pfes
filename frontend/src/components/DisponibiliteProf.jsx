@@ -118,4 +118,4 @@ function DisponibiliteProf() {
   )
 }
 
-export default DisponibiliteProf
+export default DisponibiliteProf;
