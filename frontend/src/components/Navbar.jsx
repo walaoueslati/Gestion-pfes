@@ -3,8 +3,6 @@ import logo from "../assets/images/logo.png";
 
 function Navbar({ onToggleSidebar }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-
   return (
     <nav className="bg-zinc-50 shadow">
       <div className="px-4 sm:px-6 lg:px-8">
