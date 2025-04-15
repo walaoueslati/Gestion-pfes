@@ -1,10 +1,9 @@
-// components/DisponibiliteProf.js
 import React, { useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
 const heuresPossibles = [
-  '08:00', '09:00', '10:00', '11:00', '13:00',
+  '08:00', '09:00', '10:00', '11:00','13:00',
   '14:00', '15:00', '16:00', '17:00'
 ]
 
@@ -14,7 +13,6 @@ function DisponibiliteProf() {
 
   const toggleSeance = (heure) => {
     if (!selectedDate) return
-
     const dateStr = selectedDate.toDateString()
     const heures = disponibilites[dateStr] || []
 
@@ -37,7 +35,7 @@ function DisponibiliteProf() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-8 mt-24 bg-white shadow-lg rounded-xl">
+<div className="max-w-5xl mx-auto p-8 mt-24 bg-white shadow-lg ">
       <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Remplir votre disponibilité</h2>
 
       <div className="flex flex-col lg:flex-row justify-center items-start gap-8">
@@ -52,7 +50,7 @@ function DisponibiliteProf() {
           />
         </div>
 
-        {/* Séances */}
+        {/* Séances toujours visibles */}
         <div className="flex-1">
           <p className="mb-3 font-semibold text-gray-700">
             {selectedDate
