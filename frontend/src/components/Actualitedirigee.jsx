@@ -2,6 +2,7 @@ import React from "react";
 
 function Actualitedirigee() {
   return (
+    
 <div className="p-6 ">
   <h2 className="text-2xl font-bold mb-4">📰 Actualités Dirigées  </h2>
   <ul className="space-y-4">
