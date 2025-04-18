@@ -1,20 +1,28 @@
 from rest_framework import serializers
 from .models import *
 from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UserSerializer(serializers.ModelSerializer):
-    token = serializers.SerializerMethodField()
-
+    role_data = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'nom', 'prenom', 'date_naissance', 'token']
+        fields = ['id', 'username', 'email', 'nom', 'prenom', 'CIN', 'dateNaissance', 'role_data',]
+
+    def get_role_data(self, obj):
+        if hasattr(obj, 'prof'):
+            return ProfSerializer(obj.prof).data
+        elif hasattr(obj, 'etudiant'):
+            return EtudiantSerializer(obj.etudiant).data
+        elif hasattr(obj, 'adminuser'):
+            return AdminSerializer(obj.adminuser).data
+        return None
 
     def get_token(self, obj):
-        token, created = Token.objects.get_or_create(user=obj)
-        token, created = Token.objects.get_or_create(user=obj)
-        return token.key
+        token = RefreshToken.for_user(obj)
+        return str(token.access_token)
 
 class ProfSerializer(serializers.ModelSerializer):
     class Meta:

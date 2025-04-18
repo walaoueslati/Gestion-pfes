@@ -1,17 +1,19 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.forms import ValidationError
+from django.contrib.auth.hashers import make_password
 
 # ======== USER ========
 class User(AbstractUser):
     CIN = models.CharField(max_length=20, unique=True)
+    email = models.EmailField(unique=True)
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
     dateNaissance = models.DateField(null=True, blank=True)
-    
 
+    
     def __str__(self):
-        return f"{self.nom} {self.prenom}"
+        return self.email
 
     def get_user_type(self):
         """
@@ -24,6 +26,19 @@ class User(AbstractUser):
         elif hasattr(self, 'adminuser'):
             return 'Admin'
         return 'Inconnu'
+    
+    def save(self, *args, **kwargs):
+        # Hash password if it's in plaintext
+        if not self.password.startswith('pbkdf2_sha256$'):
+            self.password = make_password(self.password)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Utilisateur"
+        verbose_name_plural = "Utilisateurs"
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']    
 
 # ======== PROF ========
 class Prof(User):
@@ -43,6 +58,10 @@ class Prof(User):
         """
         return self.role
 
+    class Meta:
+        verbose_name = "Professeur"
+        verbose_name_plural = "Professeurs"
+
 # ======== ETUDIANT ========
 class Etudiant(User):
     numCartEtudiant = models.CharField(max_length=20, unique=True)
@@ -51,12 +70,20 @@ class Etudiant(User):
     def __str__(self):
         return f"Etudiant: {self.nom} {self.prenom}"
 
+    class Meta:
+        verbose_name = "Étudiant"
+        verbose_name_plural = "Étudiants"
+
 # ======== ADMIN ========
 class AdminUser(User):  # Ne pas utiliser 'Admin' pour éviter conflit avec Django admin
     matAdmin = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return f"Admin: {self.nom} {self.prenom}"
+
+    class Meta:
+        verbose_name = "Administrateur"
+        verbose_name_plural = "Administrateurs"
 
 class Disponibilite(models.Model):
     prof = models.ForeignKey(Prof, on_delete=models.CASCADE, related_name='disponibilites')
@@ -73,6 +100,10 @@ class Disponibilite(models.Model):
     def __str__(self):
         return f"{self.prof} - {self.date} : {self.seances}"
 
+    class Meta:
+        verbose_name = "Disponibilité"
+        verbose_name_plural = "Disponibilités"
+
 # ======== SOUTENANCE ========
 class Soutenance(models.Model):
     sujet = models.CharField(max_length=255)
@@ -85,3 +116,7 @@ class Soutenance(models.Model):
 
     def __str__(self):
         return f"Soutenance: {self.sujet} - {self.date} ({self.num_salle} - {self.seance})"
+
+    class Meta:
+        verbose_name = "Soutenance"
+        verbose_name_plural = "Soutenances"

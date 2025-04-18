@@ -1,23 +1,18 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status,permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import *
 from .serializers import *
-
-
-# CRUD ViewSets
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
 
 class ProfViewSet(viewsets.ModelViewSet):
     queryset = Prof.objects.all()
     serializer_class = ProfSerializer
+   # permission_classes = [permissions.IsAuthenticated]  # ou [permissions.AllowAny] si tu veux ouvrir à tous
+
 
 
 class EtudiantViewSet(viewsets.ModelViewSet):
@@ -40,30 +35,29 @@ class SoutenanceViewSet(viewsets.ModelViewSet):
     serializer_class = SoutenanceSerializer
 
 
-# Login par email
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def login_view(request):
-    email = request.data.get("email")
-    password = request.data.get("password")
+#login
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims 
+        token['email'] = user.email
+        token['username'] = user.username
+        token['user_type'] = user.get_user_type()
+        return token
 
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        return Response({"error": "Utilisateur non trouvé"}, status=status.HTTP_404_NOT_FOUND)
+    def validate(self, attrs):
+        data = super().validate(attrs)#apres la validation de etmai et password get la response access et refersh token 
+        
+        # add user data with role-specific information
+        serializer = UserSerializer(self.user)
+        data['user'] = serializer.data
+        
+        return data
 
-    user = authenticate(username=user.username, password=password)
-    if user:
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({
-            "token": token.key,
-            "user": UserSerializer(user).data
-        })
-    else:
-        return Response({"error": "Email ou mot de passe invalide"}, status=status.HTTP_401_UNAUTHORIZED)
-
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 @api_view(['POST'])
 def logout_view(request):
-    request.user.auth_token.delete()
     return Response({"message": "Déconnexion réussie"}, status=status.HTTP_200_OK)
