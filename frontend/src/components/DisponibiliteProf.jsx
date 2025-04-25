@@ -1,41 +1,32 @@
-import React, { useState } from 'react'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
+import React, { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleSeance, resetDisponibilites } from '../features/disponibiliteSlice';
 
-const heuresPossibles = [
-  '08:00', '09:00', '10:00', '11:00','13:00',
-  '14:00', '15:00', '16:00', '17:00'
-]
+const heuresPossibles = ['08:00', '09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
 
 function DisponibiliteProf() {
-  const [selectedDate, setSelectedDate] = useState(null)
-  const [disponibilites, setDisponibilites] = useState({})
+  const [selectedDate, setSelectedDate] = useState(null);
+  const disponibilites = useSelector(state => state.disponibilite.disponibilites);
+  const dispatch = useDispatch();
 
-  const toggleSeance = (heure) => {
-    if (!selectedDate) return
-    const dateStr = selectedDate.toDateString()
-    const heures = disponibilites[dateStr] || []
-
-    if (heures.includes(heure)) {
-      setDisponibilites({
-        ...disponibilites,
-        [dateStr]: heures.filter(h => h !== heure),
-      })
-    } else {
-      setDisponibilites({
-        ...disponibilites,
-        [dateStr]: [...heures, heure],
-      })
-    }
-  }
+  const handleToggle = (heure) => {
+    if (!selectedDate) return;
+    dispatch(toggleSeance({ dateStr: selectedDate.toDateString(), heure }));
+  };
 
   const handleSubmit = () => {
-    console.log("Disponibilités soumises :", disponibilites)
-    alert("Disponibilités enregistrées avec succès ✅")
-  }
+    console.log("Disponibilités soumises :", disponibilites);
+    alert("Disponibilités enregistrées avec succès ✅");
+  };
+
+  const handleReset = () => {
+    dispatch(resetDisponibilites());
+  };
 
   return (
-<div className="max-w-5xl mx-auto p-8 mt-24 bg-white shadow-lg ">
+    <div className="max-w-5xl mx-auto p-8 mt-24 bg-white shadow-lg">
       <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Remplir votre disponibilité</h2>
 
       <div className="flex flex-col lg:flex-row justify-center items-start gap-8">
@@ -45,12 +36,13 @@ function DisponibiliteProf() {
             selected={selectedDate}
             onChange={(date) => setSelectedDate(date)}
             dateFormat="dd/MM/yyyy"
+            minDate={new Date()}
             inline
             calendarClassName="!text-lg"
           />
         </div>
 
-        {/* Séances toujours visibles */}
+        {/* Sélection des heures */}
         <div className="flex-1">
           <p className="mb-3 font-semibold text-gray-700">
             {selectedDate
@@ -61,7 +53,7 @@ function DisponibiliteProf() {
             {heuresPossibles.map((heure) => (
               <button
                 key={heure}
-                onClick={() => toggleSeance(heure)}
+                onClick={() => handleToggle(heure)}
                 disabled={!selectedDate}
                 className={`py-2 px-4 rounded text-sm font-medium transition duration-150 ${
                   selectedDate && disponibilites[selectedDate.toDateString()]?.includes(heure)
@@ -102,17 +94,24 @@ function DisponibiliteProf() {
         </div>
       )}
 
-      {/* Bouton enregistrer */}
-      <div className="flex justify-center">
+      {/* Actions */}
+      <div className="flex justify-center gap-4">
         <button
           onClick={handleSubmit}
           className="mt-8 bg-blue-700 hover:bg-blue-900 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition"
         >
           Enregistrer les disponibilités
         </button>
+
+        <button
+          onClick={handleReset}
+          className="mt-8 bg-red-600 hover:bg-red-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition"
+        >
+          Réinitialiser
+        </button>
       </div>
     </div>
-  )
+  );
 }
 
 export default DisponibiliteProf;

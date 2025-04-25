@@ -14,8 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
     def get_role_data(self, obj):
         if hasattr(obj, 'prof'):
             return ProfSerializer(obj.prof).data
-        elif hasattr(obj, 'etudiant'):
-            return EtudiantSerializer(obj.etudiant).data
+        # elif hasattr(obj, 'etudiant'):
+        #     return EtudiantSerializer(obj.etudiant).data
         elif hasattr(obj, 'adminuser'):
             return AdminSerializer(obj.adminuser).data
         return None

@@ -1,18 +1,28 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAffectations, clearAffectations } from '../features/affectationSlice';
 import * as XLSX from 'xlsx';
 
 const Affectation = () => {
   const [classesFile, setClassesFile] = useState(null);
   const [studentsFile, setStudentsFile] = useState(null);
-  const [affectations, setAffectations] = useState([]);
+
+  const dispatch = useDispatch();
+  const affectations = useSelector((state) => state.affectation.resultats);
+
+
 
   const handleUpload = () => {
-    // Exemple de simulation (remplacer par traitement réel des fichiers si besoin)
+    // Simulation only - replace with real processing later
     const resultats = [
       { etudiant: 'Ali Ben Salah', encadrant: 'Dr. Karim', classe: 'Salle A1' },
       { etudiant: 'Fatma Trabelsi', encadrant: 'Mme. Souad', classe: 'Salle B2' },
     ];
-    setAffectations(resultats);
+    dispatch(setAffectations(resultats));
+  };
+
+  const handleReset = () => {
+    dispatch(clearAffectations());
   };
 
   const handleDownload = () => {
@@ -29,7 +39,7 @@ const Affectation = () => {
       {/* Upload des fichiers */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="flex flex-col">
-          <label className="font-semibold mb-2 text-gray-700"> Disponibilité des classes</label>
+          <label className="font-semibold mb-2 text-gray-700">Disponibilité des classes</label>
           <input
             type="file"
             accept=".csv, .xlsx"
@@ -38,7 +48,7 @@ const Affectation = () => {
           />
         </div>
         <div className="flex flex-col">
-          <label className="font-semibold mb-2 text-gray-700"> Étudiants & Encadrants</label>
+          <label className="font-semibold mb-2 text-gray-700">Étudiants & Encadrants</label>
           <input
             type="file"
             accept=".csv, .xlsx"
@@ -48,23 +58,32 @@ const Affectation = () => {
         </div>
       </div>
 
-      {/* Bouton de simulation */}
-      <div className="flex gap-4">
+      {/* Boutons */}
+      <div className="flex gap-4 flex-wrap">
         <button
           onClick={handleUpload}
           disabled={!classesFile || !studentsFile}
           className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition"
         >
-         Simuler l'Affectation
+          Simuler l'Affectation
         </button>
 
         {affectations.length > 0 && (
-          <button
-            onClick={handleDownload}
-            className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition"
-          >
-            Télécharger Résultat
-          </button>
+          <>
+            <button
+              onClick={handleDownload}
+              className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition"
+            >
+              Télécharger Résultat
+            </button>
+
+            <button
+              onClick={handleReset}
+              className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition"
+            >
+              Réinitialiser
+            </button>
+          </>
         )}
       </div>
 

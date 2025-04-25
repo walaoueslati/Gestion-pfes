@@ -19,13 +19,20 @@ class User(AbstractUser):
         """
         Renvoie le type d'utilisateur général : Prof, Etudiant ou Admin
         """
-        if hasattr(self, 'etudiant'):
-            return 'Etudiant'
-        elif hasattr(self, 'prof'):
+        if hasattr(self, 'prof'):
             return 'Prof'
         elif hasattr(self, 'adminuser'):
             return 'Admin'
         return 'Inconnu'
+
+        # if hasattr(self, 'etudiant'):
+        #     return 'Etudiant'
+        # elif hasattr(self, 'prof'):
+        #     return 'Prof'
+        # elif hasattr(self, 'adminuser'):
+        #     return 'Admin'
+        # return 'Inconnu'
+
     
     def save(self, *args, **kwargs):
         # Hash password if it's in plaintext

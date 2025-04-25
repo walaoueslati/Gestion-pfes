@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-^sb2%*ihn409bkf!@g2js)bw@@+i5+#(!ezswntn1@2+cu#-)!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -42,9 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'rest_framework_simplejwt',  # Add this
-
-    
+    'rest_framework_simplejwt',  # Add this   
 ]
 
 SIMPLE_JWT = {
@@ -86,7 +84,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 
 ]
-
+CORS_ALLOW_ALL_ORIGINS = True  
 ROOT_URLCONF = 'backendPFE.urls'
 
 TEMPLATES = [
@@ -166,6 +164,10 @@ AUTH_USER_MODEL = 'pfeApp.User'
 
 # Autoriser toutes les origines CORS (à adapter en prod)
 CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',  # React development server (replace with your React app URL)
+]
 
 # Authentification Token
 REST_FRAMEWORK = {
