@@ -23,7 +23,7 @@ class User(AbstractUser):
             return 'Prof'
         elif hasattr(self, 'adminuser'):
             return 'Admin'
-        return 'Inconnu'
+        return 'Inknown'
 
         # if hasattr(self, 'etudiant'):
         #     return 'Etudiant'

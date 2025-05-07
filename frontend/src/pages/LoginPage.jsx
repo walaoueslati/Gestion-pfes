@@ -1,40 +1,81 @@
+// src/pages/LoginPage.jsx
 import React, { useState } from "react";
-import axios from "../api/axios"; // your custom axios instance
-import logo from "../assets/images/logo.png";
-import { useNavigate } from "react-router-dom"; // for redirecting after login
+import axios from "../api/axios";
+import { useNavigate, useLocation } from "react-router-dom";
 
-function Login() {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get role from query param (e.g. /login?role=admin)
+  const queryParams = new URLSearchParams(location.search);
+  const roleFromUrl = queryParams.get("role"); // 'admin' or 'prof'
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
+      // Clear any existing auth data before login
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("user");
+
+      // Send login request
       const res = await axios.post("login/", {
         email,
         password,
       });
 
-      localStorage.setItem("access_token", res.data.access);
-      localStorage.setItem("refresh_token", res.data.refresh);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      console.log("Raw response:", res);
 
-      navigate("/dashboard"); // or wherever you want to redirect
+      // Manually parse if needed
+      const parsedData =
+        typeof res.data === "string" ? JSON.parse(res.data) : res.data;
+
+      console.log("Parsed login response:", parsedData);
+
+      // Save to localStorage
+      localStorage.setItem("access_token", parsedData.access);
+      localStorage.setItem("refresh_token", parsedData.refresh);
+      localStorage.setItem("user", JSON.stringify(parsedData.user));
+
+      // Get user type
+      const userType = parsedData.user.type;
+
+      // Validate role if selected
+      if (roleFromUrl === "admin" && userType !== "Admin") {
+        setError("Accès refusé : Vous n'êtes pas administrateur.");
+        return;
+      }
+
+      if (roleFromUrl === "prof" && userType !== "Prof") {
+        setError("Accès refusé : Vous n'êtes pas professeur.");
+        return;
+      }
+
+      // Redirect based on user type
+      if (userType === "Admin") {
+        navigate("/admin/actualite-dirigee");
+      } else if (userType === "Prof") {
+        navigate("/prof/disponibilite");
+      } else {
+        navigate("/");
+      }
+
     } catch (err) {
+      console.error("Login error:", err.toJSON ? err.toJSON() : err);
       setError("Email ou mot de passe invalide !");
-      console.error(err);
     }
   };
 
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img className="mx-auto h-30 w-auto" src={logo} alt="Your Company" />
         <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-sky-700">
           Bienvenu(e)
         </h2>
@@ -81,7 +122,7 @@ function Login() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <div className="text-sm text-right">
+            <div className="text-sm text-right mt-1">
               <a href="#" className="font-semibold text-zinc-600 hover:text-zinc-800">
                 mot de passe oublié?
               </a>
@@ -103,5 +144,3 @@ function Login() {
     </div>
   );
 }
-
-export default Login;

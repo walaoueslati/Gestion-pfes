@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import *
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class UserSerializer(serializers.ModelSerializer):
     role_data = serializers.SerializerMethodField()
@@ -48,3 +48,20 @@ class SoutenanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Soutenance
         fields = '__all__'
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['email'] = user.email
+        token['username'] = user.username
+        token['user_type'] = user.get_user_type()  # Make sure this is here
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['user'] = {
+            'email': self.user.email,
+            'username': self.user.username,
+            'type': self.user.get_user_type(),  # Must be sent here
+        }
+        return data

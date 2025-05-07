@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: 'http://127.0.0.1:8000/api/',
-  timeout: 5000,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
     accept: 'application/json',
@@ -11,10 +11,14 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Skip adding token on login endpoint
+    if (!config.url.includes('login')) {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
+
     return config;
   },
   (error) => Promise.reject(error)

@@ -2,9 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const affectationSlice = createSlice({
   name: 'affectation',
+
   initialState: {
     resultats: [],
   },
+  
   reducers: {
     setAffectations: (state, action) => {
       state.resultats = action.payload;

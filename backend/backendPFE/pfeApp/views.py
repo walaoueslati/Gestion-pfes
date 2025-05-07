@@ -7,7 +7,10 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import *
 from .serializers import *
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
+from .permissions import IsAdminUser, IsProfOrAdmin
 class ProfViewSet(viewsets.ModelViewSet):
     queryset = Prof.objects.all()
     serializer_class = ProfSerializer
@@ -58,6 +61,32 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
+
 @api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
 def logout_view(request):
-    return Response({"message": "Déconnexion réussie"}, status=status.HTTP_200_OK)
+    try:
+        refresh_token = request.data.get("refresh_token")
+        if not refresh_token:
+            return Response({"error": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+
+        return Response({"message": "Logged out successfully."}, status=status.HTTP_200_OK)
+    except TokenError as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error": "An error occurred during logout."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    from .permissions import IsAdminUser, IsProfUser, IsProfOrAdmin
+
+class ProfViewSet(viewsets.ModelViewSet):
+    queryset = Prof.objects.all()
+    serializer_class = ProfSerializer
+    permission_classes = [IsAdminUser]  # Only admins can modify profs
+
+class SoutenanceViewSet(viewsets.ModelViewSet):
+    queryset = Soutenance.objects.all()
+    serializer_class = SoutenanceSerializer
+    permission_classes = [IsProfOrAdmin]  # Both can access soutenance
