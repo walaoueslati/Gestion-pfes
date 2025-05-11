@@ -12,7 +12,6 @@ function Actualite() {
       <span className="text-sm text-gray-400">Posté le 15 avril 2025</span>
     </li>
   </ul>
-  
 </div>
 
   )

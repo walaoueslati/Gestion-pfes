@@ -86,7 +86,18 @@ class ProfViewSet(viewsets.ModelViewSet):
     serializer_class = ProfSerializer
     permission_classes = [IsAdminUser]  # Only admins can modify profs
 
+from rest_framework import viewsets
+from rest_framework.permissions import SAFE_METHODS
+
 class SoutenanceViewSet(viewsets.ModelViewSet):
     queryset = Soutenance.objects.all()
     serializer_class = SoutenanceSerializer
-    permission_classes = [IsProfOrAdmin]  # Both can access soutenance
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            # Allow read-only access for both Prof and Admin
+            self.permission_classes = [IsProfOrAdmin]
+        else:
+            # Only Admin can create/update/delete
+            self.permission_classes = [IsAdminUser]
+        return super().get_permissions()

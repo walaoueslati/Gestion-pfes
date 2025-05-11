@@ -1,26 +1,22 @@
-import axios from 'axios';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { clearAuthData } from '../features/auth/authSlice';
+import useAuth from '../hooks/useAuth';
 
-const LogoutButton = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+export default function LogoutButton() {
+  const { logout, user } = useAuth();
 
-  const handleLogout = async () => {
-    const refreshToken = localStorage.getItem('refreshToken');
-
-    try {
-      await axios.post('http://localhost:8000/api/logout/', {
-        refresh_token: refreshToken,
-      });
-    } finally {
-      dispatch(clearAuthData());
-      navigate('/');
-    }
-  };
-
-  return <button onClick={handleLogout}>Logout</button>;
-};
-
-export default LogoutButton;
+  return (
+    <button
+      onClick={logout}
+      style={{
+        padding: "0.5rem 1rem",
+        backgroundColor: "#4479A3",
+        color: "white",
+        border: "none",
+        borderRadius: "0.375rem",
+        cursor: "pointer",
+        fontWeight: "bold"
+      }}
+    >
+      Se déconnecter ({user?.nom})
+    </button>
+  );
+}

@@ -17,13 +17,13 @@ class User(AbstractUser):
 
     def get_user_type(self):
         """
-        Renvoie le type d'utilisateur général : Prof, Etudiant ou Admin
+        Renvoie le type d'utilisateur général : Prof,  Admin
         """
         if hasattr(self, 'prof'):
             return 'Prof'
         elif hasattr(self, 'adminuser'):
             return 'Admin'
-        return 'Inknown'
+        return 'Unknown'
 
         # if hasattr(self, 'etudiant'):
         #     return 'Etudiant'
@@ -49,21 +49,9 @@ class User(AbstractUser):
 
 # ======== PROF ========
 class Prof(User):
-    ROLE_CHOICES = [
-        ('Encadrant', 'Encadrant'),
-        ('Rapporteur', 'Rapporteur'),
-        ('President', 'President'),
-    ]
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
-
+   
     def __str__(self):
-        return f"Prof: {self.nom} {self.prenom} ({self.role})"
-
-    def get_prof_role(self):
-        """
-        Renvoie le rôle spécifique du prof : Encadrant, Rapporteur ou Président
-        """
-        return self.role
+        return f"Prof: {self.nom} {self.prenom}"
 
     class Meta:
         verbose_name = "Professeur"
@@ -118,12 +106,26 @@ class Soutenance(models.Model):
     num_salle = models.CharField(max_length=20)
     seance = models.CharField(max_length=20)
 
-    etudiant = models.ForeignKey(Etudiant, on_delete=models.CASCADE, related_name='soutenances')
-    profs = models.ManyToManyField(Prof, related_name='soutenances')  # Encadrant, Rapporteur, Président
-
+    etudiant = models.ForeignKey('Etudiant', on_delete=models.CASCADE, related_name='soutenances')
+    
+    profs = models.ManyToManyField('Prof', through='ProfRoleInSoutenance', related_name='soutenances')
     def __str__(self):
         return f"Soutenance: {self.sujet} - {self.date} ({self.num_salle} - {self.seance})"
 
     class Meta:
         verbose_name = "Soutenance"
         verbose_name_plural = "Soutenances"
+
+class ProfRoleInSoutenance(models.Model):
+    ROLE_CHOICES = [
+        ('Encadrant', 'Encadrant'),
+        ('Rapporteur', 'Rapporteur'),
+        ('President', 'President'),
+    ]
+
+    prof = models.ForeignKey('Prof', on_delete=models.CASCADE)
+    soutenance = models.ForeignKey('Soutenance', on_delete=models.CASCADE)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+
+    def __str__(self):
+        return f"{self.prof} - {self.role} in {self.soutenance}"

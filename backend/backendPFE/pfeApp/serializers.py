@@ -3,7 +3,7 @@ from .models import *
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
+from .models import ProfRoleInSoutenance
 class UserSerializer(serializers.ModelSerializer):
     role_data = serializers.SerializerMethodField()
 
@@ -44,10 +44,36 @@ class DisponibiliteSerializer(serializers.ModelSerializer):
         model = Disponibilite
         fields = '__all__'
 
+# class SoutenanceSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Soutenance
+#         fields = '__all__'
+class ProfRoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfRoleInSoutenance
+        fields = ['prof', 'role']
+
+
 class SoutenanceSerializer(serializers.ModelSerializer):
+    profs_with_roles = ProfRoleSerializer(many=True, write_only=True)
+    profs = serializers.StringRelatedField(many=True, read_only=True)
+
     class Meta:
         model = Soutenance
-        fields = '__all__'
+        fields = ['id', 'sujet', 'date', 'num_salle', 'seance', 'etudiant', 'profs', 'profs_with_roles']
+
+    def create(self, validated_data):
+        profs_data = validated_data.pop('profs_with_roles')
+        soutenance = Soutenance.objects.create(**validated_data)
+
+        for item in profs_data:
+            ProfRoleInSoutenance.objects.create(
+                soutenance=soutenance,
+                prof=item['prof'],
+                role=item['role']
+            )
+
+        return soutenance
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -60,6 +86,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         data['user'] = {
+            'id':self.user.id,
             'email': self.user.email,
             'username': self.user.username,
             'type': self.user.get_user_type(),  # Must be sent here

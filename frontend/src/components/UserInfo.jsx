@@ -1,13 +1,16 @@
 import React from "react";
+import useAuth from "../hooks/useAuth";
 
 export default function UserInfo() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user, isAuthenticated } = useAuth();
 
-  if (!user) return null;
+  if (!isAuthenticated) return null;
 
   return (
     <div style={{ textAlign: "center", marginTop: "1rem" }}>
-      <p>Connecté en tant que : <strong>{user.type}</strong></p>
+      <p>
+        Connecté en tant que : <strong>{user.type}</strong> | {user.nom} {user.prenom}
+      </p>
     </div>
   );
 }
